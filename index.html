@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>SISTEMA MAGP - 08D01 ESMERALDAS</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root { --azul: #003366; --oro: #b45309; --gris: #f1f5f9; --verde: #10b981; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--gris); margin: 0; padding: 10px; }
+        .login-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--azul); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .card-login { background: white; padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .card { max-width: 950px; margin: 10px auto; background: white; padding: 25px; border-radius: 8px; border-top: 12px solid var(--azul); box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: none; }
+        .admin-panel { background: #e2e8f0; border: 2px solid var(--azul); padding: 15px; margin-bottom: 20px; border-radius: 8px; font-size: 12px; }
+        .seccion { border: 1px solid #ccc; padding: 12px; border-radius: 5px; margin-bottom: 15px; background: #fff; }
+        .titulo-s { background: var(--azul); color: white; padding: 5px 10px; font-size: 13px; margin-top: 0; border-radius: 3px; font-weight: bold; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        label { font-size: 10px; font-weight: bold; color: #444; display: block; margin-top: 5px; }
+        input, textarea { width: 100%; padding: 6px; border: 1px solid #999; border-radius: 4px; box-sizing: border-box; font-size: 12px; }
+        .combustible-box { background: #fff7ed; border: 2px solid var(--oro); }
+        canvas { border: 1px solid #000; background: #fff; width: 100%; height: 90px; cursor: crosshair; touch-action: none; }
+        .btn-pdf { background: #dc2626; color: white; padding: 15px; width: 100%; border: none; font-size: 18px; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 10px; }
+        .total-box { background: #334155; color: white; padding: 10px; text-align: center; border-radius: 4px; }
+        @media print { .no-print { display: none; } }
+    </style>
+</head>
+<body>
+
+<div id="overlay" class="login-overlay no-print">
+    <div class="card-login">
+        <h2 style="color:var(--azul)">DIRECCIÓN DISTRITAL 08D01</h2>
+        <p>CONTROL VEHICULAR - MAGP</p>
+        <input type="text" id="user" placeholder="Cédula" style="margin-bottom:10px; width:100%; padding:8px;"><br>
+        <input type="password" id="pass" placeholder="Contraseña" style="margin-bottom:10px; width:100%; padding:8px;"><br>
+        <button onclick="verificar()" style="background:var(--azul); color:white; padding:10px; width:100%; border:none; cursor:pointer;">INGRESAR</button>
+    </div>
+</div>
+
+<div class="card" id="documento-imprimir">
+    <div id="panel-admin" class="admin-panel no-print" style="display:none;">
+        <h4 style="margin:0 0 10px 0;">⚙️ CONFIGURACIÓN DE CORREOS Y USUARIOS</h4>
+        <div class="grid">
+            <div><label>Correo Jefa Transporte:</label><input type="email" id="m-trans"></div>
+            <div><label>Correo Jefe Financiero:</label><input type="email" id="m-finan"></div>
+            <div><button onclick="saveC()" style="margin-top:20px; width:100%; background:var(--azul); color:white; border:none; padding:5px; cursor:pointer;">GUARDAR CORREOS</button></div>
+        </div>
+        <hr>
+        <div class="grid">
+            <input type="text" id="n-nom" placeholder="Nombre Chofer">
+            <input type="text" id="n-ced" placeholder="Cédula">
+            <input type="text" id="n-pas" placeholder="Clave">
+            <button onclick="crearU()" style="background:var(--verde); color:white; border:none; cursor:pointer;">CREAR CHOFER</button>
+        </div>
+    </div>
+
+    <div style="text-align:center; border-bottom: 3px solid var(--azul); padding-bottom:5px;">
+        <h2 style="margin:0; font-size:18px; color:var(--azul);">DIRECCIÓN DISTRITAL 08D01 ESMERALDAS - MAGP</h2>
+        <p style="margin:5px; font-weight:bold;">ORDEN UNIFICADA: MOVILIZACIÓN Y SUMINISTRO DE COMBUSTIBLE</p>
+    </div>
+
+    <div class="seccion">
+        <p class="titulo-s">1. DATOS DE MOVILIZACIÓN (ORDEN DE SALIDA)</p>
+        <div class="grid">
+            <div><label>Solicitante del Vehículo:</label><input type="text"></div>
+            <div><label>No. Memorando Solicitud:</label><input type="text"></div>
+            <div><label>Presidente de la Comisión:</label><input type="text"></div>
+            <div style="grid-column: span 3;"><label>Integrantes de la Comisión:</label><textarea rows="2"></textarea></div>
+            <div><label>Marca del Vehículo:</label><input type="text"></div>
+            <div><label>Modelo del Vehículo:</label><input type="text"></div>
+            <div><label>Placa del Vehículo:</label><input type="text"></div>
+            <div><label>Origen de Comisión:</label><input type="text"></div>
+            <div><label>Destino de Comisión:</label><input type="text"></div>
+            <div><label>Fecha Salida:</label><input type="date"></div>
+            <div><label>Hora Salida:</label><input type="time"></div>
+            <div><label>Hora Llegada:</label><input type="time"></div>
+            <div><label>KM Salida:</label><input type="number"></div>
+            <div><label>KM Llegada:</label><input type="number"></div>
+        </div>
+        <label style="margin-top:10px;">Motivo de la Comisión:</label><textarea rows="1"></textarea>
+    </div>
+
+    <div class="seccion combustible-box">
+        <p class="titulo-s" style="background:var(--oro)">2. ORDEN DE SUMINISTRO DE COMBUSTIBLE</p>
+        <div class="grid">
+            <div><label>SUPER (Gal):</label><input type="number" id="g_s" value="0" oninput="calc()"></div>
+            <div><label>EXTRA (Gal):</label><input type="number" id="g_e" value="0" oninput="calc()"></div>
+            <div><label>DIESEL (Gal):</label><input type="number" id="g_d" value="0" oninput="calc()"></div>
+            <div><label>LUBRICANTES ($):</label><input type="number" id="v_lub" value="0" oninput="calc()"></div>
+            <div><label>LAVADO ($):</label><input type="number" id="v_lav" value="0" oninput="calc()"></div>
+            <div class="total-box"><label style="color:white">TOTAL GALONES</label><div id="t_g" style="font-weight:bold;">0.00</div></div>
+            <div class="total-box" style="background:var(--verde)"><label style="color:white">TOTAL DÓLARES</label><div id="t_u" style="font-weight:bold;">$ 0.00</div></div>
+        </div>
+        <label>Actividad a desarrollar con el combustible:</label><textarea rows="1"></textarea>
+    </div>
+
+    <div class="seccion">
+        <p class="titulo-s" style="background:#444">3. VALIDACIÓN DE FIRMAS REQUERIDAS</p>
+        <div class="grid">
+            <div style="text-align:center;">
+                <label>FIRMA DEL CONDUCTOR</label>
+                <canvas id="f1"></canvas>
+                <button class="no-print" onclick="limpiar()" style="font-size:9px;">Borrar</button>
+            </div>
+            <div style="text-align:center; opacity:0.7;">
+                <label>JEFA DE TRANSPORTE</label>
+                <div style="height:90px; border:1px solid #ccc; background:#f0f0f0; display:flex; align-items:center; justify-content:center; font-size:9px;">AUTORIZACIÓN ELECTRÓNICA</div>
+            </div>
+            <div style="text-align:center; opacity:0.7;">
+                <label>JEFE FINANCIERO</label>
+                <div style="height:90px; border:1px solid #ccc; background:#f0f0f0; display:flex; align-items:center; justify-content:center; font-size:9px;">VALIDACIÓN DE FONDOS</div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-pdf no-print" onclick="generarPDF()">GENERAR ORDEN OFICIAL (PDF)</button>
+</div>
+
+<script>
+    let usuarios = JSON.parse(localStorage.getItem('u_08d01')) || [{n:'Admin Roberto', c:'0801550096', p:'Roberto_1971'}];
+    function verificar() {
+        const u = document.getElementById('user').value, p = document.getElementById('pass').value;
+        const found = usuarios.find(x => x.c === u && x.p === p);
+        if(found) {
+            document.getElementById('overlay').style.display = "none";
+            document.getElementById('documento-imprimir').style.display = "block";
+            if(u === "0801550096") document.getElementById('panel-admin').style.display = "block";
+            initFirma();
+        } else { alert("Usuario o clave incorrecta"); }
+    }
+    function calc() {
+        const s = parseFloat(document.getElementById('g_s').value)||0, e = parseFloat(document.getElementById('g_e').value)||0, d = parseFloat(document.getElementById('g_d').value)||0;
+        const lu = parseFloat(document.getElementById('v_lub').value)||0, la = parseFloat(document.getElementById('v_lav').value)||0;
+        document.getElementById('t_g').innerText = (s+e+d).toFixed(2);
+        document.getElementById('t_u').innerText = "$ " + ((s*3.95)+(e*2.40)+(d*1.75)+lu+la).toFixed(2);
+    }
+    function initFirma() {
+        const can = document.getElementById('f1'); const ctx = can.getContext('2d'); let dr = false;
+        const pos = (e) => { const r = can.getBoundingClientRect(); return { x: (e.clientX || e.touches[0].clientX) - r.left, y: (e.clientY || e.touches[0].clientY) - r.top }; };
+        can.onmousedown = (e) => { dr = true; const p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); };
+        can.onmousemove = (e) => { if(dr) { const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); } };
+        window.onmouseup = () => dr = false;
+        can.ontouchstart = (e) => { dr = true; const p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); e.preventDefault(); };
+        can.ontouchmove = (e) => { if(dr) { const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); e.preventDefault(); } };
+    }
+    function limpiar() { const can = document.getElementById('f1'); can.getContext('2d').clearRect(0,0,can.width,can.height); }
+    function crearU() {
+        usuarios.push({n: document.getElementById('n-nom').value, c: document.getElementById('n-ced').value, p: document.getElementById('n-pas').value});
+        localStorage.setItem('u_08d01', JSON.stringify(usuarios)); alert("Chofer Creado");
+    }
+    function generarPDF() {
+        const opt = { margin: 0.3, filename: 'Orden_Oficial_08D01.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } };
+        html2pdf().set(opt).from(document.getElementById('documento-imprimir')).save();
+    }
+</script>
+</body>
+</html>
